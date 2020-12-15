@@ -13,42 +13,33 @@ import java.util.List;
 @Repository
 public class UserDaoImp implements UserDao {
 
-   @Autowired
-   private SessionFactory sessionFactory;
+    @Autowired
+    private SessionFactory sessionFactory;
 
-   @Override
-   public void add(User user) {
-      sessionFactory.getCurrentSession().save(user);
-   }
+    @Override
+    public void add(User user) {
+        sessionFactory.getCurrentSession().save(user);
+    }
 
-   @Override
-   public User find(Long id) {
-      return sessionFactory.getCurrentSession().get(User.class, id);
-   }
+    @Override
+    public User find(Long id) {
+        return sessionFactory.getCurrentSession().get(User.class, id);
+    }
 
-   @Override
-   public User findByCar(String name, int series) {
-      User foundUser = null;
+    @Override
+    public User findByCar(String name, int series) {
 
-      TypedQuery<Car> hql = sessionFactory.getCurrentSession().createQuery("from Car where model = :name and series = :ser", Car.class)
-              .setParameter("name", name).setParameter("ser", series);
-      Car car = hql.getSingleResult();
+        TypedQuery<User> hql = sessionFactory.getCurrentSession().createQuery("select user from User user where user.car.model=:name and user.car.series=:series", User.class)
+                .setParameter("name", name).setParameter("series", series);
 
-      List<User> listofAll = listUsers();
+        return hql.getSingleResult();
+    }
 
-      for (User i: listofAll) {
-         if(i.getCar().getId().equals(car.getId())) {
-            foundUser = i;
-         }
-      }
-      return foundUser;
-   }
-
-   @Override
-   @SuppressWarnings("unchecked")
-   public List<User> listUsers() {
-      TypedQuery<User> query=sessionFactory.getCurrentSession().createQuery("from User");
-      return query.getResultList();
-   }
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<User> listUsers() {
+        TypedQuery<User> query = sessionFactory.getCurrentSession().createQuery("from User");
+        return query.getResultList();
+    }
 
 }
